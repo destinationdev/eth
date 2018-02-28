@@ -24,7 +24,7 @@ contract Enrollment {
       usdTuition = _usdTuition;
       spotRate = _spotRate;
 
-      weiTuition = spotRate / usdTuition;
+      weiTuition = spotRate * usdTuition;
 
       lastUpdatedTuitionBlock = block.number;
     }
@@ -47,10 +47,10 @@ contract Enrollment {
       }
     }
 
-    function changeMaxSeats(uint newMaxSeats) public {
+    /* function changeMaxSeats(uint newMaxSeats) public {
       require(msg.sender == owner);
       require(newMaxSeats > 0);
 
       maxSeats = newMaxSeats;
-    }
+    } */
 }

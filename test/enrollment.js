@@ -5,7 +5,7 @@ contract('Enrollment', function(accounts) {
   let web3;
 
   beforeEach(async () => {
-    enrollment = await Enrollment.new(2, 2, 800000000000000000);
+    enrollment = await Enrollment.new(2, 2000, 1000000000000000);
     web3 = enrollment.constructor.web3;
   });
 
@@ -22,20 +22,20 @@ contract('Enrollment', function(accounts) {
 
     it("sets the usdTuition based on second argument", async () => {
       let usdTuition = await enrollment.usdTuition();
-      assert.equal(usdTuition, 2);
+      assert.equal(usdTuition, 2000);
     });
 
     it("sets the spotRate based on third argument", async () => {
       let spotRate = await enrollment.spotRate();
-      assert.equal(spotRate, 800000000000000000);
+      assert.equal(spotRate, 1000000000000000);
     });
 
-    it("sets the weiTuition based on spot / usd", async () => {
+    it("sets the weiTuition based on spot * usd", async () => {
       let spotRate = (await enrollment.spotRate()).toFixed();
       let usdTuition = (await enrollment.usdTuition()).toFixed();
       let weiTuition = (await enrollment.weiTuition()).toFixed();
 
-      assert.equal(weiTuition, (spotRate / usdTuition));
+      assert.equal(weiTuition, (spotRate * usdTuition));
     });
 
     it("sets the lastUpdatedTuitionBlock to the block number of the contract", async () => {
@@ -106,38 +106,38 @@ contract('Enrollment', function(accounts) {
 
       assert.equal(student[0], accounts[8]);
       assert.equal(student[1].toFixed(), 0);
-      assert.equal(student[2].toFixed(), 8000000000000000000);
+      assert.equal(student[2].toFixed(), 2000000000000000000);
       assert.equal(web3.toAscii(student[3]), "doug");
     });
 
-    it("refunds overpayment", async () => {
-      await enrollment.enroll(web3.fromAscii("doug"), {value: 800000000000000000, from: accounts[8]});
-
-    });
+    // it("refunds overpayment", async () => {
+    //   await enrollment.enroll(web3.fromAscii("doug"), {value: 800000000000000000, from: accounts[8]});
+    //
+    // });
   });
 
-  describe("#changeMaxSeats()", () => {
-    it.only("rejects calls from senders other than the owner", () => {
-      await enrollment.changeMaxSeats(10);
-      let err;
+  // describe("#changeMaxSeats()", () => {
+  //   it.only("rejects calls from senders other than the owner", async () => {
+  //     await enrollment.changeMaxSeats(10);
+  //     let err;
+  //
+  //     try {
+  //       await enrollment.enroll("fail", {value: 8000000000000000000, from: accounts[1]});
+  //     } catch(error) {
+  //       err = error;
+  //     }
+  //
+  //     assert.isOk(err);
+  //   });
+  // });
 
-      try {
-        await enrollment.enroll("fail", {value: 8000000000000000000, from: accounts[1]});
-      } catch(error) {
-        err = error;
-      }
-
-      assert.isOk(err);
-    });
-  });
-
-  describe("#changeTuition()");
-
-  describe("#changeSpotRate()");
-
-  describe("#issueRefund()");
-
-  describe("#requestOverpaymentRefund()");
+  // describe("#changeTuition()");
+  //
+  // describe("#changeSpotRate()");
+  //
+  // describe("#issueRefund()");
+  //
+  // describe("#requestOverpaymentRefund()");
 
   // From the frontend, use mailgun API, firbase, etc. to capture email address and send confirmation and invoice
   // Oracle cron job to update spot rate
