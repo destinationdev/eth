@@ -114,6 +114,19 @@ contract('Enrollment', function(accounts) {
     //   await enrollment.enroll(web3.fromAscii("doug"), {value: 800000000000000000, from: accounts[8]});
     //
     // });
+
+    it("emits a logEnroll event following successfull enrollment", async () => {
+     const logEnroll = enrollment.LogEnroll();
+
+     logEnroll.watch((error, event) => {
+       logEnroll.stopWatching();
+
+       assert.equal(event.args.student, accounts[6]);
+       assert.equal(web3.toAscii(event.args.name), "doug");
+     });
+
+     await enrollment.enroll(web3.fromAscii("doug"), {value: 8000000000000000000, from: accounts[6]});
+    });
   });
 
   // describe("#changeMaxSeats()", () => {

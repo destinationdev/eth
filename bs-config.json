@@ -1,0 +1,5 @@
+{
+  "server": {
+    "baseDir": ["./src", "./build/contracts", "./bower_components"]
+  }
+}

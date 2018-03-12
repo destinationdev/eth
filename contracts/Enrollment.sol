@@ -1,12 +1,15 @@
 pragma solidity ^0.4.17;
 
-contract Enrollment {
-    address public owner;
+import './Ownable.sol';
+
+contract Enrollment is Ownable {
     uint public maxSeats;
     uint public usdTuition;
     uint public weiTuition;
     uint public spotRate; //This is wei/usd rate. create oracle for up-to-date pricing
     uint public lastUpdatedTuitionBlock;
+
+    event LogEnroll(address student, bytes name);
 
     struct Student {
       address uuid;
@@ -19,7 +22,6 @@ contract Enrollment {
     address[] public studentList;
 
     function Enrollment(uint _maxSeats, uint _usdTuition, uint _spotRate) public {
-      owner = msg.sender;
       maxSeats = _maxSeats;
       usdTuition = _usdTuition;
       spotRate = _spotRate;
@@ -41,16 +43,36 @@ contract Enrollment {
         name: name
       });
 
+      LogEnroll(msg.sender, name);
+
       if(msg.value > weiTuition) {
         msg.sender.transfer(msg.value - weiTuition);
         students[msg.sender].balance = weiTuition;
       }
     }
 
+    function rosterLength() public view returns (uint) {
+      return studentList.length;
+    }
+
+    /* withdraw a set amount (argument) of ETH to owner account */
+    /* function collect() public onlyOwner {
+      owner.transfer(this.balance);
+    } */
+
+    /* Just empty all ETH in contract to owner's account */
+    /* function empty() public onlyOwner {
+
+    } */
+
     /* function changeMaxSeats(uint newMaxSeats) public {
       require(msg.sender == owner);
       require(newMaxSeats > 0);
 
       maxSeats = newMaxSeats;
+    } */
+
+    /* function refund(address student) public {
+
     } */
 }
