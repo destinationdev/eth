@@ -56,14 +56,21 @@ contract Enrollment is Ownable {
     }
 
     /* withdraw a set amount (argument) of ETH to owner account */
-    /* function collect() public onlyOwner {
-      owner.transfer(this.balance);
-    } */
+    function collect(uint amount) public onlyOwner {
+      require(msg.sender == owner);
+      require(amount <= this.balance);
+      require(amount >= spotRate);
+
+      owner.transfer(amount);
+    }
 
     /* Just empty all ETH in contract to owner's account */
-    /* function empty() public onlyOwner {
+    function empty() public onlyOwner {
+      require(msg.sender == owner);
+      require(this.balance > (tx.gasprice * block.gaslimit));
 
-    } */
+      owner.transfer(this.balance);
+    }
 
     function updateMaxSeats(uint newMaxSeats) public {
       require(msg.sender == owner);
@@ -71,19 +78,21 @@ contract Enrollment is Ownable {
       maxSeats = newMaxSeats;
     }
 
-    /* function updateUsdTuition(uint newMaxSeats) public {
+    function updateTuition(uint newTuition) public {
       require(msg.sender == owner);
-      require(newMaxSeats > 0);
 
-      maxSeats = newMaxSeats;
-    } */
+      usdTuition = newTuition;
+      weiTuition = usdTuition * spotRate;
+      lastUpdatedTuitionBlock = block.number;
+    }
 
-    /* function updateSpotRate(uint newMaxSeats) public {
+    function updateSpotRate(uint newSpotRate) public {
       require(msg.sender == owner);
-      require(newMaxSeats > 0);
 
-      maxSeats = newMaxSeats;
-    } */
+      spotRate = newSpotRate;
+      weiTuition = usdTuition * spotRate;
+      lastUpdatedTuitionBlock = block.number;
+    }
 
     /* function refund(address student) public {
 

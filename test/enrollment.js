@@ -163,13 +163,177 @@ contract('Enrollment', function(accounts) {
     });
   });
 
-  // describe("#changeTuition()");
-  //
-  // describe("#changeSpotRate()");
-  //
-  // describe("#issueRefund()");
-  //
-  // describe("#requestOverpaymentRefund()");
+  describe("#updateTuition()", () => {
+    it("rejects calls from senders other than the owner", async () => {
+      let err;
+
+      try {
+        await enrollment.updateTuition(3000, {from: accounts[1]});
+      } catch(error) {
+        err = error;
+      }
+
+      assert.isOk(err);
+    });
+
+    it("allows updates from the owner", async () => {
+      await enrollment.updateTuition(3000);
+
+      let usdTuition = (await enrollment.usdTuition()).toFixed();
+
+      assert.equal(usdTuition, 3000);
+    });
+
+    it("updates the wei tuition", async () => {
+      await enrollment.updateTuition(3000);
+
+      let weiTuition = (await enrollment.weiTuition()).toFixed();
+
+      assert.equal(weiTuition, 3000 * initialSpotRate);
+    });
+
+    it("updates the last updated tuition block number", async () => {
+      let blockNumber = (await enrollment.updateTuition(3000)).receipt.blockNumber;
+
+      let lastBlockNumber = await enrollment.lastUpdatedTuitionBlock();
+
+      assert.equal(lastBlockNumber, blockNumber);
+    });
+  });
+
+  describe("#updateSpotRate()", () => {
+    it("rejects calls from senders other than the owner", async () => {
+      let err;
+
+      try {
+        await enrollment.updateSpotRate(1200000000000000, {from: accounts[4]});
+      } catch(error) {
+        err = error;
+      }
+
+      assert.isOk(err);
+    });
+
+    it("allows updates from the owner", async () => {
+      await enrollment.updateSpotRate(1200000000000000);
+
+      let spotRate = (await enrollment.spotRate()).toFixed();
+
+      assert.equal(spotRate, 1200000000000000);
+    });
+
+    it("updates the wei tuition", async () => {
+      await enrollment.updateSpotRate(1200000000000000);
+
+      let weiTuition = (await enrollment.weiTuition()).toFixed();
+
+      assert.equal(weiTuition, 1200000000000000 * initialUsdTuition);
+    });
+
+    it("updates the last updated tuition block number", async () => {
+      let blockNumber = (await enrollment.updateSpotRate(1200000000000000)).receipt.blockNumber;
+
+      let lastBlockNumber = await enrollment.lastUpdatedTuitionBlock();
+
+      assert.equal(lastBlockNumber, blockNumber);
+    });
+  });
+
+  describe("#empty()", () => {
+    it("rejects calls from senders other than the owner", async () => {
+      let err;
+      await enrollment.enroll(web3.fromAscii("doug"), {value: 8000000000000000000, from: accounts[6]});
+
+      try {
+        await enrollment.empty({from: accounts[2]});
+      } catch(error) {
+        err = error;
+      }
+
+      assert.isOk(err);
+    });
+
+    it("errors if the balance is too low", async () => {
+      let err;
+
+      try {
+        await enrollment.empty();
+      } catch(error) {
+        err = error;
+      }
+
+      assert.isOk(err);
+    });
+
+    it("transfers the full contract balance to the owner", async () => {
+      await enrollment.enroll(web3.fromAscii("doug"), {value: 2000000000000000000, from: accounts[6]});
+      assert.equal((await web3.eth.getBalance(enrollment.address)).toFixed(), 2000000000000000000);
+
+      let gasPrice = 100000000000;
+      let originalAccountBalance = parseInt((await web3.eth.getBalance(accounts[0])).toFixed());
+      let emptyTx = await enrollment.empty({from: accounts[0], gasPrice: gasPrice});
+      let gasUsed = emptyTx["receipt"]["gasUsed"];
+      let balanceAfterEmpty = parseInt((await web3.eth.getBalance(accounts[0])).toFixed());
+
+      assert.equal(balanceAfterEmpty, (originalAccountBalance + (initialUsdTuition * initialSpotRate) - (gasUsed * gasPrice)));
+      assert.equal((await web3.eth.getBalance(enrollment.address)).toFixed(), 0);
+    });
+  });
+
+  describe("#collect()", () => {
+    it("rejects calls from senders other than the owner", async () => {
+      let err;
+      await enrollment.enroll(web3.fromAscii("doug"), {value: 8000000000000000000, from: accounts[6]});
+
+      try {
+        await enrollment.collect(1000000000000000000, {from: accounts[2]});
+      } catch(error) {
+        err = error;
+      }
+
+      assert.isOk(err);
+    });
+
+    it("errors if collection amount is greater than the contract balance", async () => {
+      let err;
+      await enrollment.enroll(web3.fromAscii("doug"), {value: 2000000000000000000, from: accounts[6]});
+
+      try {
+        await enrollment.collect(7000000000000000000);
+      } catch(error) {
+        err = error;
+      }
+
+      assert.isOk(err);
+    });
+
+    it("errors if the collection amount is less than the spot rate (1 USD)", async () => {
+      let err;
+      await enrollment.enroll(web3.fromAscii("doug"), {value: 2000000000000000000, from: accounts[6]});
+
+      try {
+        await enrollment.collect(initialSpotRate - 1);
+      } catch(error) {
+        err = error;
+      }
+
+      assert.isOk(err);
+    });
+
+    it("transfers the amount to the owner", async () => {
+      await enrollment.enroll(web3.fromAscii("doug"), {value: 2000000000000000000, from: accounts[6]});
+      assert.equal((await web3.eth.getBalance(enrollment.address)).toFixed(), 2000000000000000000);
+
+      let gasPrice = 100000000000;
+      let originalAccountBalance = parseInt((await web3.eth.getBalance(accounts[0])).toFixed());
+      let collectTx = await enrollment.collect(initialSpotRate, {from: accounts[0], gasPrice: gasPrice});
+      let gasUsed = collectTx["receipt"]["gasUsed"];
+      let balanceAfterCollect = parseInt((await web3.eth.getBalance(accounts[0])).toFixed());
+
+      assert.equal(balanceAfterCollect, (originalAccountBalance + initialSpotRate - (gasUsed * gasPrice)));
+      assert.equal((await web3.eth.getBalance(enrollment.address)).toFixed(), 2000000000000000000 - initialSpotRate);
+    });
+  });
 
   // From the frontend, use mailgun API, firbase, etc. to capture email address and send confirmation and invoice
   // Oracle cron job to update spot rate
