@@ -3,9 +3,15 @@ var Enrollment = artifacts.require("./Enrollment.sol");
 contract('Enrollment', function(accounts) {
   let enrollment;
   let web3;
+  let initialSpotRate;
+  let initialUsdTuition;
+  let initialMaxSeats;
 
   beforeEach(async () => {
-    enrollment = await Enrollment.new(2, 2000, 1000000000000000);
+    initialSpotRate = 1000000000000000;
+    initialUsdTuition = 2000;
+    initialMaxSeats = 2;
+    enrollment = await Enrollment.new(initialMaxSeats, initialUsdTuition, initialSpotRate);
     web3 = enrollment.constructor.web3;
   });
 
@@ -110,10 +116,16 @@ contract('Enrollment', function(accounts) {
       assert.equal(web3.toAscii(student[3]), "doug");
     });
 
-    // it("refunds overpayment", async () => {
-    //   await enrollment.enroll(web3.fromAscii("doug"), {value: 800000000000000000, from: accounts[8]});
-    //
-    // });
+    it("refunds overpayment", async () => {
+      let gasPrice = 100000000000;
+      let weiTuition = parseInt((await enrollment.weiTuition()).toFixed());
+      let originalAccountBalance = parseInt((await web3.eth.getBalance(accounts[9])).toFixed());
+      let enrollmentTx = await enrollment.enroll(web3.fromAscii("doug"), {value: 8000000000000000000, from: accounts[9], gasPrice: gasPrice});
+      let gasUsed = enrollmentTx["receipt"]["gasUsed"];
+      let balanceAfterEnrollment = parseInt((await web3.eth.getBalance(accounts[9])).toFixed());
+
+      assert.equal(balanceAfterEnrollment, (originalAccountBalance - weiTuition - (gasUsed * gasPrice)));
+    });
 
     it("emits a logEnroll event following successfull enrollment", async () => {
      const logEnroll = enrollment.LogEnroll();
@@ -129,20 +141,27 @@ contract('Enrollment', function(accounts) {
     });
   });
 
-  // describe("#changeMaxSeats()", () => {
-  //   it.only("rejects calls from senders other than the owner", async () => {
-  //     await enrollment.changeMaxSeats(10);
-  //     let err;
-  //
-  //     try {
-  //       await enrollment.enroll("fail", {value: 8000000000000000000, from: accounts[1]});
-  //     } catch(error) {
-  //       err = error;
-  //     }
-  //
-  //     assert.isOk(err);
-  //   });
-  // });
+  describe("#updateMaxSeats()", () => {
+    it("rejects calls from senders other than the owner", async () => {
+      let err;
+
+      try {
+        await enrollment.updateMaxSeats(10, {from: accounts[1]});
+      } catch(error) {
+        err = error;
+      }
+
+      assert.isOk(err);
+    });
+
+    it("allows updates from the owner", async () => {
+      await enrollment.updateMaxSeats(11);
+
+      let maxSeats = (await enrollment.maxSeats()).toFixed();
+
+      assert.equal(maxSeats, 11);
+    });
+  });
 
   // describe("#changeTuition()");
   //

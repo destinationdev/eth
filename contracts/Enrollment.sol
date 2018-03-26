@@ -65,7 +65,20 @@ contract Enrollment is Ownable {
 
     } */
 
-    /* function changeMaxSeats(uint newMaxSeats) public {
+    function updateMaxSeats(uint newMaxSeats) public {
+      require(msg.sender == owner);
+
+      maxSeats = newMaxSeats;
+    }
+
+    /* function updateUsdTuition(uint newMaxSeats) public {
+      require(msg.sender == owner);
+      require(newMaxSeats > 0);
+
+      maxSeats = newMaxSeats;
+    } */
+
+    /* function updateSpotRate(uint newMaxSeats) public {
       require(msg.sender == owner);
       require(newMaxSeats > 0);
 
