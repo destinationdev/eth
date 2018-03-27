@@ -335,6 +335,78 @@ contract('Enrollment', function(accounts) {
     });
   });
 
+  describe("refund", () => {
+    it("rejects calls from senders other than the owner", async () => {
+      let err;
+      await enrollment.enroll(web3.fromAscii("doug"), {value: 8000000000000000000, from: accounts[6]});
+
+      try {
+        await enrollment.refund(accounts[6], {from: accounts[2]});
+      } catch(error) {
+        err = error;
+      }
+
+      assert.isOk(err);
+    });
+
+    it("rejects calls to refund an address that isn't known", async () => {
+      let err;
+      await enrollment.enroll(web3.fromAscii("doug"), {value: 8000000000000000000, from: accounts[6]});
+
+      try {
+        await enrollment.refund(accounts[1], {from: accounts[0]});
+      } catch(error) {
+        err = error;
+      }
+
+      assert.isOk(err);
+    });
+
+    it("transfers the balance back to the address", async () => {
+      let tuition = 2000000000000000000;
+      await enrollment.enroll(web3.fromAscii("doug"), {value: tuition, from: accounts[3]});
+      let originalAccountBalance = parseInt((await web3.eth.getBalance(accounts[3])).toFixed());
+      await enrollment.refund(accounts[3], {from: accounts[0]});
+      let balanceAfterRefund = parseInt((await web3.eth.getBalance(accounts[3])).toFixed());
+
+      assert.equal(balanceAfterRefund, originalAccountBalance + tuition);
+    });
+
+    it("deletes the refunded address from the students mapping", async () => {
+      let tuition = 2000000000000000000;
+      await enrollment.enroll(web3.fromAscii("doug"), {value: tuition, from: accounts[3]});
+      await enrollment.refund(accounts[3], {from: accounts[0]});
+      let mappingVal = await enrollment.students(accounts[3]);
+
+      assert.equal(mappingVal[0], '0x0000000000000000000000000000000000000000');
+    });
+
+    it("deletes the refunded address from the student list", async () => {
+      let tuition = 2000000000000000000;
+      await enrollment.enroll(web3.fromAscii("doug"), {value: tuition, from: accounts[3]});
+      let index = (await enrollment.students(accounts[3]))[1].toFixed();
+
+      await enrollment.refund(accounts[3], {from: accounts[0]});
+      let listVal = await enrollment.studentList(index);
+
+      assert.equal(listVal, '0x0000000000000000000000000000000000000000');
+    });
+
+    it("decrements the class size", async () => {
+      let tuition = 2000000000000000000;
+      await enrollment.enroll(web3.fromAscii("doug"), {value: tuition, from: accounts[4]});
+      await enrollment.enroll(web3.fromAscii("doug"), {value: tuition, from: accounts[5]});
+
+      let fullClass = (await enrollment.classSize()).toFixed();
+      assert.equal(fullClass, 2);
+
+      await enrollment.refund(accounts[4], {from: accounts[0]});
+
+      let reducedClass = (await enrollment.classSize()).toFixed();
+      assert.equal(reducedClass, 1);
+
+    });
+  });
   // From the frontend, use mailgun API, firbase, etc. to capture email address and send confirmation and invoice
   // Oracle cron job to update spot rate
   // accept deposit vs. full tuition. Can make this time-sensitive also and send deposit to another account

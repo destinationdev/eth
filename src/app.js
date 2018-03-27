@@ -58,7 +58,7 @@ App = {
   fetchInitialContractData: function() {
     App.checkEnrollment();
     App.fetchMaxSeats()
-      .then(() => App.fetchRosterLength())
+      .then(() => App.fetchClassSize())
       .then(() => App.populateClassSize());
     App.fetchUsdTuition()
       .then(() => App.fetchWeiTuition())
@@ -76,12 +76,12 @@ App = {
     });
   },
 
-  fetchRosterLength: function() {
+  fetchClassSize: function() {
     return new Promise((resolve, reject) => {
       App.contracts.Enrollment.deployed().then((instance) => {
-        return instance.rosterLength();
+        return instance.classSize();
       }).then((val) => {
-        App.store.rosterLength = val.toFixed();
+        App.store.classSize = val.toFixed();
         resolve();
       });
     });
@@ -111,7 +111,7 @@ App = {
 
   populateClassSize: function() {
     $("#class-size").append(`
-      <h3>${App.store.rosterLength}/${App.store.maxSeats} students enrolled. ${App.store.maxSeats - App.store.rosterLength} spots remaining!</h3>
+      <h3>${App.store.classSize}/${App.store.maxSeats} students enrolled. ${App.store.maxSeats - App.store.classSize} spots remaining!</h3>
     `);
   },
 

@@ -8,6 +8,7 @@ contract Enrollment is Ownable {
     uint public weiTuition;
     uint public spotRate; //This is wei/usd rate. create oracle for up-to-date pricing
     uint public lastUpdatedTuitionBlock;
+    uint public classSize;
 
     event LogEnroll(address student, bytes name);
 
@@ -22,6 +23,7 @@ contract Enrollment is Ownable {
     address[] public studentList;
 
     function Enrollment(uint _maxSeats, uint _usdTuition, uint _spotRate) public {
+      classSize = 0;
       maxSeats = _maxSeats;
       usdTuition = _usdTuition;
       spotRate = _spotRate;
@@ -43,16 +45,13 @@ contract Enrollment is Ownable {
         name: name
       });
 
+      classSize += 1;
       LogEnroll(msg.sender, name);
 
       if(msg.value > weiTuition) {
         msg.sender.transfer(msg.value - weiTuition);
         students[msg.sender].balance = weiTuition;
       }
-    }
-
-    function rosterLength() public view returns (uint) {
-      return studentList.length;
     }
 
     /* withdraw a set amount (argument) of ETH to owner account */
@@ -94,7 +93,16 @@ contract Enrollment is Ownable {
       lastUpdatedTuitionBlock = block.number;
     }
 
-    /* function refund(address student) public {
+    function refund(address studentAddress) public {
+      require(msg.sender == owner);
+      require(students[studentAddress].balance != 0);
 
-    } */
+      uint balance = students[studentAddress].balance;
+      uint index = students[studentAddress].index;
+
+      studentAddress.transfer(balance);
+      delete students[studentAddress];
+      delete studentList[index];
+      classSize -=1;
+    }
 }
