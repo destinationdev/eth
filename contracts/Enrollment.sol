@@ -100,9 +100,10 @@ contract Enrollment is Ownable {
       uint balance = students[studentAddress].balance;
       uint index = students[studentAddress].index;
 
-      studentAddress.transfer(balance);
       delete students[studentAddress];
       delete studentList[index];
       classSize -=1;
+
+      studentAddress.transfer(balance);
     }
 }
