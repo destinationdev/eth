@@ -72,6 +72,7 @@ contract Enrollment is Ownable {
 
     function updateMaxSeats(uint newMaxSeats) public {
       require(msg.sender == owner);
+      require(newMaxSeats >= classSize);
 
       maxSeats = newMaxSeats;
     }

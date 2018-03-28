@@ -161,6 +161,19 @@ contract('Enrollment', function(accounts) {
 
       assert.equal(maxSeats, 11);
     });
+
+    it("rejects maxSeats numbers less than the classSize", async () => {
+      let err;
+      await enrollment.enroll(web3.fromAscii("doug"), {value: 2000000000000000000, from: accounts[2]});
+      await enrollment.enroll(web3.fromAscii("doug"), {value: 2000000000000000000, from: accounts[3]});
+      try {
+        await enrollment.updateMaxSeats(1, {from: accounts[0]});
+      } catch(error) {
+        err = error;
+      }
+
+      assert.isOk(err);
+    });
   });
 
   describe("#updateTuition()", () => {
