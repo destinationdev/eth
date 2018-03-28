@@ -124,7 +124,7 @@ contract('Enrollment', function(accounts) {
       let gasUsed = enrollmentTx["receipt"]["gasUsed"];
       let balanceAfterEnrollment = parseInt((await web3.eth.getBalance(accounts[9])).toFixed());
 
-      assert.equal(balanceAfterEnrollment, (originalAccountBalance - weiTuition - (gasUsed * gasPrice)));
+      assert.approximately(balanceAfterEnrollment, (originalAccountBalance - weiTuition - (gasUsed * gasPrice)), 1000000);
     });
 
     it("emits a logEnroll event following successfull enrollment", async () => {
@@ -330,7 +330,7 @@ contract('Enrollment', function(accounts) {
       let gasUsed = collectTx["receipt"]["gasUsed"];
       let balanceAfterCollect = parseInt((await web3.eth.getBalance(accounts[0])).toFixed());
 
-      assert.equal(balanceAfterCollect, (originalAccountBalance + initialSpotRate - (gasUsed * gasPrice)));
+      assert.approximately(balanceAfterCollect, (originalAccountBalance + initialSpotRate - (gasUsed * gasPrice)), 1000000);
       assert.equal((await web3.eth.getBalance(enrollment.address)).toFixed(), 2000000000000000000 - initialSpotRate);
     });
   });
@@ -407,6 +407,8 @@ contract('Enrollment', function(accounts) {
 
     });
   });
+
+  //uppbound values to prevent underflow
   // From the frontend, use mailgun API, firbase, etc. to capture email address and send confirmation and invoice
   // Oracle cron job to update spot rate
   // accept deposit vs. full tuition. Can make this time-sensitive also and send deposit to another account
