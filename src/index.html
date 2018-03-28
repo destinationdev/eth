@@ -7,8 +7,11 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>Destination: Dev ETH Course Enrollment</title>
 
+    <link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
     <!-- Bootstrap -->
     <link href="bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="index.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -18,19 +21,49 @@
     <![endif]-->
   </head>
   <body>
-    <div class="container">
-      <h1>Destination: Dev Blockchain Course Enrollment</h1>
-      <div class="row" id="tuition">
+    <div class="container content-container text-center">
+      <h1>Destination: Dev<br/>ETH Course Enrollment</h1>
+      <div class="row">
+        <div class="col-md-12" id="tuition">
+        </div>
       </div>
-      <div class="row" id="class-size">
+      <div class="row">
+        <div class="col-md-12" id="class-size">
+        </div>
       </div>
-      <div class="row" id="enrollment-div">
-        <p style="display: none" id="error-msg">Oops! Looks like there was an error processing your payment. Please try again.</p>
-        <form id="enrollment-form">
-          <input type="text" name="name" placeholder="Name" id="enrollment-form-name" required/>
-          <input type=email name="email" placeholder="Email" id="enrollment-form-email" required/>
-          <input type="submit" value="Enroll"/>
-        </form>
+      <div class="row">
+        <div class="col-md-8 offset-md-2" id="enrollment-div" class="text-center">
+          <p style="display: none" id="error-msg">Oops! Looks like there was an error processing your payment. Please try again.</p>
+          <form id="enrollment-form">
+            <div class="form-group">
+              <input type="text" name="name" placeholder="Name" class="form-control" id="enrollment-form-name" required/>
+            </div>
+            <div>
+              <input type=email name="email" placeholder="Email" class="form-control" id="enrollment-form-email" required/>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2 enrollment-btn">Enroll</button>
+          </form>
+        </div>
+      </div>
+      <div class="row info">
+        <div class="col-md-10 offset-md-1">
+          <p>
+            This is an example dApp simulating enrollment in
+            <a href="http://www.destinationdev.com/blockchain/">Destination: Dev's upcoming
+            Ethereum smart contract and dApp development course</a>. This page interacts
+            with a smart contract deployed to the Rinkeby testnet that allows students to
+            enroll in the course with an updateable tuition, eth/usd spot rate, and class size.
+            (view the code <a href="https://github.com/destinationdev/eth_enrollment">here</a>).
+          </p>
+          <p>
+            We'll deploy this contract to the mainnet and use it for real at some point, but for
+            now you can enroll in a faux course (and maybe win a prize) by enrolling with Rinkeby ether
+            following <a href="google.com">these instructions</a>.
+          </p>
+          <ol>
+
+          </ol>
+        </div>
       </div>
     </div>
 

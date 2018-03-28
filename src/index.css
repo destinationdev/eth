@@ -1,0 +1,50 @@
+body {
+  font-family: 'Dosis', sans-serif;
+  background: #363636;
+  font-size: 20px;
+  color: #fff;
+}
+
+h1 {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #fff;
+  font-weight: 100;
+  font-size: 56px;
+}
+
+a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #e6e6e6;
+}
+
+.content-container {
+vertical-align:middle;
+margin-top: 50px;
+}
+
+.enrollment-btn {
+  padding: 10px 20px;
+  font-size: 24px;
+  text-transform: uppercase;
+  background: #D17B6D;
+  border-color: #D17B6D;
+  letter-spacing: 1.5px;
+}
+
+.enrollment-btn:hover {
+  background: #c86051;
+  border-color: #c86051;
+}
+
+#enrollment-form {
+  margin-top: 30px;
+}
+
+.info {
+  margin-top: 60px;
+}
