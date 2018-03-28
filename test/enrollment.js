@@ -308,19 +308,6 @@ contract('Enrollment', function(accounts) {
       assert.isOk(err);
     });
 
-    it("errors if the collection amount is less than the spot rate (1 USD)", async () => {
-      let err;
-      await enrollment.enroll(web3.fromAscii("doug"), {value: 2000000000000000000, from: accounts[6]});
-
-      try {
-        await enrollment.collect(initialSpotRate - 1);
-      } catch(error) {
-        err = error;
-      }
-
-      assert.isOk(err);
-    });
-
     it("transfers the amount to the owner", async () => {
       await enrollment.enroll(web3.fromAscii("doug"), {value: 2000000000000000000, from: accounts[6]});
       assert.equal((await web3.eth.getBalance(enrollment.address)).toFixed(), 2000000000000000000);

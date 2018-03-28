@@ -58,7 +58,6 @@ contract Enrollment is Ownable {
     function collect(uint amount) public onlyOwner {
       require(msg.sender == owner);
       require(amount <= this.balance);
-      require(amount >= spotRate);
 
       owner.transfer(amount);
     }
