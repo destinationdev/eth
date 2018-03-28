@@ -263,7 +263,7 @@ contract('Enrollment', function(accounts) {
       let gasUsed = emptyTx["receipt"]["gasUsed"];
       let balanceAfterEmpty = parseInt((await web3.eth.getBalance(accounts[0])).toFixed());
 
-      assert.equal(balanceAfterEmpty, (originalAccountBalance + (initialUsdTuition * initialSpotRate) - (gasUsed * gasPrice)));
+      assert.approximately(balanceAfterEmpty, (originalAccountBalance + (initialUsdTuition * initialSpotRate) - (gasUsed * gasPrice)), 1000000);
       assert.equal((await web3.eth.getBalance(enrollment.address)).toFixed(), 0);
     });
   });
