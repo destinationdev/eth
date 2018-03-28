@@ -49,8 +49,8 @@ contract Enrollment is Ownable {
       LogEnroll(msg.sender, name);
 
       if(msg.value > weiTuition) {
-        msg.sender.transfer(msg.value - weiTuition);
         students[msg.sender].balance = weiTuition;
+        msg.sender.transfer(msg.value - weiTuition);
       }
     }
 
