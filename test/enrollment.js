@@ -253,18 +253,6 @@ contract('Enrollment', function(accounts) {
       assert.isOk(err);
     });
 
-    it("errors if the balance is too low", async () => {
-      let err;
-
-      try {
-        await enrollment.empty();
-      } catch(error) {
-        err = error;
-      }
-
-      assert.isOk(err);
-    });
-
     it("transfers the full contract balance to the owner", async () => {
       await enrollment.enroll(web3.fromAscii("doug"), {value: 2000000000000000000, from: accounts[6]});
       assert.equal((await web3.eth.getBalance(enrollment.address)).toFixed(), 2000000000000000000);

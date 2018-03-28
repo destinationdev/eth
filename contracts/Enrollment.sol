@@ -66,7 +66,6 @@ contract Enrollment is Ownable {
     /* Just empty all ETH in contract to owner's account */
     function empty() public onlyOwner {
       require(msg.sender == owner);
-      require(this.balance > (tx.gasprice * block.gaslimit));
 
       owner.transfer(this.balance);
     }
