@@ -20,7 +20,7 @@ App = {
   },
 
   initContract: function() {
-    $.getJSON('Enrollment.json', function(data) {
+    $.getJSON('public/Enrollment.json', function(data) {
       // Get the necessary contract artifact file and instantiate it with truffle-contract
       var EnrollmentArtifact = data;
       App.contracts.Enrollment = TruffleContract(EnrollmentArtifact);
