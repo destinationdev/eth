@@ -3,5 +3,5 @@ var Enrollment = artifacts.require("./Enrollment.sol");
 
 module.exports = function(deployer) {
   deployer.deploy(SimpleStorage);
-  deployer.deploy(Enrollment, 100, 2500, 5000000000000000);
+  deployer.deploy(Enrollment, 100, 2500, 500000000000000);
 };

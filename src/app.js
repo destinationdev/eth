@@ -11,12 +11,11 @@ App = {
     // Is there an injected web3 instance?
     if (typeof web3 !== 'undefined') {
       App.web3Provider = web3.currentProvider;
+      web3 = new Web3(App.web3Provider);
+      return App.initContract();
     } else {
-      // If no injected web3 instance is detected, fall back to Ganache
-      App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
+      App.renderNoWeb3();
     }
-    web3 = new Web3(App.web3Provider);
-    return App.initContract();
   },
 
   initContract: function() {
@@ -28,26 +27,47 @@ App = {
       // Set the provider for our contract
       App.contracts.Enrollment.setProvider(App.web3Provider);
 
-      return App.fetchInitialContractData();
+      return App.fetchContractData();
     });
     return App.bindEvents();
   },
 
   checkEnrollment: function() {
-    App.contracts.Enrollment.deployed().then((instance) => {
-      return instance.students(web3.eth.accounts[0]);
-    }).then((val) => {
-      if (val[0] !== "0x0000000000000000000000000000000000000000") {
-        App.hideEnrollmentForm();
-      }
+    return new Promise((resolve, reject) => {
+      App.contracts.Enrollment.deployed().then((instance) => {
+        return instance.students(web3.eth.accounts[0]);
+      }).then((val) => {
+        if (val[0] !== "0x0000000000000000000000000000000000000000") {
+          App.renderThankYou();
+        }
+        App.renderMainContent();
+        resolve();
+      }).catch((e) => {
+        App.renderContractError();
+      });
     });
   },
 
-  hideEnrollmentForm: function() {
+  renderThankYou: function() {
     $("#enrollment-div").html(`
       <p>
-        Thanks for enrolling! We've received your payment and we'll send you an email confirmation from us shortly.
+        Thanks for enrolling! We've received your payment </br> and we'll send you an email confirmation shortly.
       </p>
+    `);
+  },
+
+  renderSpinner: function() {
+    $("#enrollment-div").html(`
+      <div class="la-ball-grid-pulse la-2x text-center">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
     `);
   },
 
@@ -55,14 +75,29 @@ App = {
     $('#error-msg').show();
   },
 
-  fetchInitialContractData: function() {
-    App.checkEnrollment();
-    App.fetchMaxSeats()
-      .then(() => App.fetchClassSize())
-      .then(() => App.populateClassSize());
-    App.fetchUsdTuition()
-      .then(() => App.fetchWeiTuition())
-      .then(() => App.populateTuition());
+  renderNoWeb3: function() {
+    $('.content-container').hide();
+    $('.no-web3').show();
+  },
+
+  renderContractError: function() {
+    $('.content-container').hide();
+    $('.no-contract').show();
+  },
+
+  renderMainContent: function() {
+    $('.content-container').show();
+  },
+
+  fetchContractData: function() {
+    App.checkEnrollment().then(() => {
+      App.fetchMaxSeats()
+        .then(() => App.fetchClassSize())
+        .then(() => App.populateClassSize());
+      App.fetchUsdTuition()
+        .then(() => App.fetchWeiTuition())
+        .then(() => App.populateTuition());
+    });
   },
 
   fetchMaxSeats: function() {
@@ -110,14 +145,14 @@ App = {
   },
 
   populateClassSize: function() {
-    $("#class-size").append(`
+    $("#class-size").html(`
       <h3>${App.store.classSize}/${App.store.maxSeats} students enrolled. ${App.store.maxSeats - App.store.classSize} spots remaining!</h3>
     `);
   },
 
   populateTuition: function() {
     var ethTuition = (parseInt(App.store.weiTuition) / 1000000000000000000).toFixed(2);
-    $("#tuition").append(`
+    $("#tuition").html(`
       <h3>Price: \$${App.store.usdTuition} USD (${ethTuition} ETH)</h3>
     `);
   },
@@ -132,9 +167,10 @@ App = {
 
   enroll: function(name) {
     App.contracts.Enrollment.deployed().then((instance) => {
+      App.renderSpinner();
       return instance.enroll(name,{from: web3.eth.accounts[0], value: App.store.weiTuition})
     }).then(() => {
-      App.hideEnrollmentForm();
+      App.fetchContractData();
     }).catch((error) => {
       App.renderError();
     });

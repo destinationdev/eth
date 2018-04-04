@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
     <!-- Bootstrap -->
     <link href="public/bootstrap.min.css" rel="stylesheet">
+    <link href="public/ball-grid-pulse.min.css" rel="stylesheet">
 
     <link href="index.css" rel="stylesheet">
 
@@ -21,8 +22,8 @@
     <![endif]-->
   </head>
   <body>
+    <h1 class="text-center title">Destination: Dev<br/>ETH Course Enrollment</h1>
     <div class="container content-container text-center">
-      <h1>Destination: Dev<br/>ETH Course Enrollment</h1>
       <div class="row">
         <div class="col-md-12" id="tuition">
         </div>
@@ -52,7 +53,7 @@
             <a href="http://www.destinationdev.com/blockchain/">Destination: Dev's upcoming
             Ethereum smart contract and dApp development course</a>. This page interacts
             with a smart contract deployed to the Rinkeby testnet that allows students to
-            enroll in the course with an updateable tuition, eth/usd spot rate, and class size.
+            enroll in the course with an updateable tuition, ETH/USD spot rate, and class size.
             (view the code <a href="https://github.com/destinationdev/eth_enrollment">here</a>).
           </p>
           <p>
@@ -60,9 +61,28 @@
             now you can enroll in a faux course (and maybe win a prize) by enrolling with Rinkeby ether
             following <a href="https://github.com/destinationdev/eth_enrollment/blob/master/ENROLLMENT_SETUP.md">these instructions</a>.
           </p>
-          <ol>
+        </div>
+      </div>
+    </div>
 
-          </ol>
+    <div class="no-web3 container">
+      <div class="row info">
+        <div class="col-md-10 offset-md-1">
+          <h3 class="text-center">Uh oh! It looks like your browser is not yet configured to support Web3 😿.
+            Follow the instructions <a class="error-instructions-link" href="https://github.com/destinationdev/eth_enrollment/blob/master/ENROLLMENT_SETUP.md">here</a> to get started.</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="no-contract container">
+      <div class="row info">
+        <div class="col-md-10 offset-md-1">
+          <h3 class="text-center">
+            Oh no! Something went wrong 😿. The most likely problem is that you're attempting
+            to access our contract on a network to which it hasn't yet been deployed, like the
+            main network, Ropsten, etc. If you're using Metamask, switch to the Rinkeby network
+            and hopefully you'll be able to enroll without a problem. Also make sure you're logged in!
+          </h3>
         </div>
       </div>
     </div>

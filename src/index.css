@@ -23,8 +23,30 @@ a:hover {
 }
 
 .content-container {
-vertical-align:middle;
-margin-top: 50px;
+  vertical-align: middle;
+  display: none;
+}
+
+.la-ball-grid-pulse {
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+}
+
+.title {
+  margin-top: 50px;
+}
+
+.no-web3 {
+  display: none;
+}
+
+.no-contract {
+  display: none;
+}
+
+.error-instructions-link {
+  color: #D17B6D;
 }
 
 .enrollment-btn {
