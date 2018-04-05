@@ -35,7 +35,7 @@ contract Enrollment is Ownable {
 
     function enroll(bytes name) public payable {
       require(msg.value >= weiTuition);
-      require(studentList.length < maxSeats);
+      require(classSize < maxSeats);
       require(students[msg.sender].uuid == 0);
 
       students[msg.sender] = Student({
